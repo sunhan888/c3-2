@@ -1,5 +1,9 @@
 # DataMate — 내 데이터를 아는 AI 비서
 
+[![CI](https://github.com/sunhan888/c3-2/actions/workflows/ci.yml/badge.svg)](https://github.com/sunhan888/c3-2/actions/workflows/ci.yml)
+[![Live Demo](https://img.shields.io/badge/demo-c3--2--web.vercel.app-6C5CE7)](https://c3-2-web.vercel.app)
+[![API](https://img.shields.io/badge/API-c3--2--api.vercel.app-00B894)](https://c3-2-api.vercel.app/docs)
+
 > 스터디카페 일별 매출 **365건**을 분석해 요약을 만들고, 그 요약을 GPT의 시스템 프롬프트에 주입해
 > "내 상황을 아는" 답변을 돌려주는 웹 서비스입니다.
 > 일반 ChatGPT에 "이번 달 매출 어때?"라고 물으면 일반론이 돌아오지만, DataMate는 **실제 수치와 근거**로 답합니다.
@@ -10,7 +14,7 @@
 | 백엔드 | FastAPI + Pydantic v2, Swagger UI(`/docs`) |
 | 데이터베이스 | Firebase Firestore (`data`, `conversations`) |
 | LLM | OpenAI Chat Completions + Function Calling |
-| 배포 | 프론트 Vercel / 백엔드 Render |
+| 배포 | 프론트 Vercel / 백엔드 Render(운영) · Vercel(라이브 데모) |
 
 ---
 
@@ -335,6 +339,9 @@ python ../scripts/capture_screenshots.py    # README 스크린샷 재생성(Play
 ---
 
 ## 10. 배포
+
+> 현재 저장소에는 Vercel 라이브 데모(`c3-2-web`, `c3-2-api`)가 연결되어 있습니다. 아래 절차는 실제 GPT/Firestore로
+> 운영할 때의 구성입니다. 환경변수만 채우면 코드 수정 없이 동일하게 동작합니다.
 
 ### 10.1 백엔드 — Render
 
