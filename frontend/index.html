@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DataMate · 내 데이터를 아는 AI 비서</title>
+    <meta
+      name="description"
+      content="스터디카페 일별 매출 데이터를 요약해 AI가 근거 있는 답변을 제공하는 데이터 비서"
+    />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%234f46e5'/%3E%3Ctext x='50%25' y='56%25' font-family='system-ui' font-size='26' font-weight='700' fill='white' text-anchor='middle'%3EDM%3C/text%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark">DM</span>
+        <span class="brand-text">
+          <strong>DataMate</strong>
+          <small>내 데이터를 아는 AI 비서</small>
+        </span>
+      </div>
+      <div class="header-actions">
+        <button class="ghost-btn mobile-only" id="sidebar-toggle" type="button">기록</button>
+        <span class="status-chip" id="status-chip" title="백엔드 연결 상태">
+          <i class="dot"></i><span id="status-text">서버 확인 중…</span>
+        </span>
+        <a class="ghost-btn" id="docs-link" href="#" target="_blank" rel="noreferrer">Swagger</a>
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="다크 모드 전환">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="icon-moon">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
+          </svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="icon-sun">
+            <circle cx="12" cy="12" r="4.2" />
+            <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="coldstart-banner" id="coldstart-banner" hidden>
+      <span class="spinner" aria-hidden="true"></span>
+      무료 티어 서버는 첫 요청 시 최대 50초까지 걸릴 수 있어요. 잠시만 기다려 주세요…
+    </div>
+
+    <main class="layout">
+      <aside class="sidebar" id="sidebar">
+        <button class="primary-btn full" id="new-chat" type="button">+ 새 대화</button>
+
+        <div class="sidebar-head">
+          <h2>대화 기록</h2>
+          <span class="badge" id="conv-count">0</span>
+        </div>
+        <ul class="conv-list" id="conv-list" aria-live="polite"></ul>
+
+        <div class="sidebar-foot">
+          <div>
+            <span class="muted xs">API</span>
+            <code id="api-base">…</code>
+          </div>
+          <button class="link-btn" id="refresh-all" type="button">새로고침</button>
+        </div>
+      </aside>
+
+      <section class="workspace">
+        <div class="summary-grid">
+          <article class="summary-card">
+            <span class="summary-label">데이터 기간</span>
+            <strong id="sum-period">—</strong>
+            <span class="summary-sub" id="sum-period-sub">불러오는 중</span>
+          </article>
+          <article class="summary-card">
+            <span class="summary-label">레코드 수</span>
+            <strong id="sum-count">—</strong>
+            <span class="summary-sub" id="sum-count-sub">일별 데이터</span>
+          </article>
+          <article class="summary-card">
+            <span class="summary-label">일평균 매출</span>
+            <strong id="sum-avg">—</strong>
+            <span class="summary-sub" id="sum-avg-sub">최근 7일 —</span>
+          </article>
+          <article class="summary-card accent">
+            <span class="summary-label">최근 트렌드</span>
+            <strong id="sum-trend">—</strong>
+            <span class="summary-sub" id="sum-trend-sub">직전 구간 대비</span>
+          </article>
+        </div>
+
+        <nav class="tabs" role="tablist" aria-label="화면 전환">
+          <button class="tab is-active" data-tab="chat" role="tab" aria-selected="true" type="button">AI 채팅</button>
+          <button class="tab" data-tab="data" role="tab" aria-selected="false" type="button">데이터 관리</button>
+          <button class="tab" data-tab="insight" role="tab" aria-selected="false" type="button">인사이트</button>
+        </nav>
+
+        <div class="panels">
+          <!-- 채팅 -->
+          <section class="panel is-active" id="panel-chat" role="tabpanel" aria-label="AI 채팅">
+            <div class="panel-head">
+              <div>
+                <h3 id="chat-title">새 대화</h3>
+                <p class="muted small" id="chat-context">데이터 요약을 준비하고 있어요…</p>
+              </div>
+              <span class="badge soft" id="chat-model">model</span>
+            </div>
+            <div class="chat-log" id="chat-log" aria-live="polite"></div>
+            <div class="quick-row" id="quick-row"></div>
+            <form class="composer" id="composer">
+              <textarea
+                id="chat-input"
+                rows="1"
+                maxlength="2000"
+                placeholder="예) 이번 달 매출 어때? 가장 좋았던 날은 언제야?"
+                aria-label="질문 입력"
+              ></textarea>
+              <button class="primary-btn" id="send-btn" type="submit">전송</button>
+            </form>
+            <p class="composer-hint muted xs">
+              Enter 전송 · Shift+Enter 줄바꿈 · 모든 대화는 Firestore <code>conversations</code>에 자동 저장됩니다.
+            </p>
+          </section>
+
+          <!-- 데이터 관리 -->
+          <section class="panel" id="panel-data" role="tabpanel" aria-label="데이터 관리" hidden>
+            <div class="panel-head">
+              <div>
+                <h3>데이터 관리</h3>
+                <p class="muted small">날짜·값·메모를 추가/수정/삭제하면 요약과 AI 답변에 즉시 반영됩니다.</p>
+              </div>
+              <div class="export-row">
+                <button class="ghost-btn" data-export="csv" type="button">CSV 내보내기</button>
+                <button class="ghost-btn" data-export="json" type="button">JSON</button>
+              </div>
+            </div>
+
+            <form class="data-form" id="data-form">
+              <label>
+                <span>날짜</span>
+                <input type="date" id="data-date" required />
+              </label>
+              <label>
+                <span>값(원)</span>
+                <input type="number" id="data-value" min="1" max="1000000000" step="1" placeholder="520000" required />
+              </label>
+              <label class="grow">
+                <span>메모</span>
+                <input type="text" id="data-memo" maxlength="200" placeholder="예) 주말 단체 예약" />
+              </label>
+              <button class="primary-btn" type="submit" id="data-submit">추가</button>
+            </form>
+
+            <div class="table-toolbar">
+              <input type="search" id="data-search" placeholder="메모 검색 (예: 프로모션)" />
+              <span class="muted small" id="data-count"></span>
+            </div>
+
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">날짜</th>
+                    <th scope="col" class="num">매출</th>
+                    <th scope="col">메모</th>
+                    <th scope="col" class="actions-col">관리</th>
+                  </tr>
+                </thead>
+                <tbody id="data-body"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- 인사이트 -->
+          <section class="panel" id="panel-insight" role="tabpanel" aria-label="인사이트" hidden>
+            <div class="panel-head">
+              <div>
+                <h3>인사이트</h3>
+                <p class="muted small">최근 30일 추이와 요일/월별 패턴을 함께 봅니다.</p>
+              </div>
+              <span class="badge soft" id="volatility-badge">변동성 —</span>
+            </div>
+
+            <div class="card chart-card">
+              <div class="chart-head">
+                <div>
+                  <h4>일별 매출 추이</h4>
+                  <p class="muted xs">굵은 선은 7일 이동평균입니다.</p>
+                </div>
+                <div class="legend">
+                  <span class="legend-item"><i class="swatch line"></i>일별</span>
+                  <span class="legend-item"><i class="swatch ma"></i>7일 평균</span>
+                </div>
+              </div>
+              <canvas id="trend-chart" height="300" aria-label="일별 매출 추이 차트"></canvas>
+            </div>
+
+            <div class="insight-grid">
+              <div class="card">
+                <h4>요일별 평균</h4>
+                <div class="bars" id="weekday-bars"></div>
+              </div>
+              <div class="card">
+                <h4>핵심 지표</h4>
+                <ul class="stat-list" id="insight-stats"></ul>
+              </div>
+            </div>
+
+            <div class="card">
+              <h4>월별 추이</h4>
+              <div class="table-wrap compact">
+                <table class="data-table" id="monthly-table">
+                  <thead>
+                    <tr><th>월</th><th class="num">일평균</th><th class="num">합계</th><th class="num">전월 대비</th></tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" hidden></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
