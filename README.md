@@ -355,10 +355,25 @@ python ../scripts/capture_screenshots.py    # README 스크린샷 재생성(Play
 
 | 항목 | 값 |
 | --- | --- |
+| Repository | `https://github.com/sunhan888/c3-2` (Public) |
+| Branch | `main` |
 | Root Directory | `backend` |
+| Runtime | Python 3 |
 | Build Command | `pip install -r requirements.txt` |
 | Start Command | `uvicorn main:app --host 0.0.0.0 --port $PORT` |
 | Health Check Path | `/api/health` |
+| Plan | Free |
+
+**방법 C. 스크립트로 자동 배포 (Render API 키 보유 시)**
+
+```bash
+export RENDER_API_KEY=rnd_xxxxxxxx
+python scripts/deploy_render.py --openai-key sk-xxxx            # 실제 GPT 사용
+# Firestore까지 쓰려면: --firebase-json firebase-service-account.json
+```
+
+스크립트가 서비스를 생성하고(`backend` 루트, 무료 플랜) 배포 상태를 폴링한 뒤 URL을 출력합니다.
+`--openai-key`를 생략하면 `DEMO_FALLBACK=true`로 배포되어 규칙 기반 데모 응답으로 동작합니다.
 
 ### 10.2 프론트엔드 — Vercel
 
@@ -370,10 +385,15 @@ python ../scripts/capture_screenshots.py    # README 스크린샷 재생성(Play
 ### 10.3 배포 체크리스트
 
 - [ ] Render에 `OPENAI_API_KEY`, `FIREBASE_SERVICE_ACCOUNT_JSON` 등록
-- [ ] Render `ALLOWED_ORIGINS`에 Vercel 도메인 추가
-- [ ] Vercel `API_BASE_URL`에 Render 주소 설정 후 재배포
-- [ ] `https://<render>/docs` 접속 확인
+- [ ] Render `ALLOWED_ORIGINS`에 Vercel 도메인(`https://c3-2-web.vercel.app`) 추가
+- [ ] Vercel 프로젝트 `c3-2-web` → Settings → Environment Variables의 `API_BASE_URL`을
+      `https://<render-service>.onrender.com`으로 변경 후 **Redeploy**
+- [ ] `https://<render-service>.onrender.com/docs` 접속 확인
+- [ ] `/api/health`의 `llm_configured`가 `true`인지 확인
 - [ ] 프론트에서 채팅 1회, 데이터 추가 1회 실행해 CORS/키 확인
+
+> 프론트의 API 주소는 빌드 타임에 `js/config.js`로 주입됩니다. 환경변수를 바꾼 뒤에는 반드시 재배포해야 반영됩니다.
+> (주소를 바꾸지 않으면 현재처럼 Vercel 데모 API를 계속 사용합니다.)
 
 ---
 
