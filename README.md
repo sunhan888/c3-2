@@ -56,15 +56,28 @@ DataMate의 처리 흐름은 다음과 같습니다.
 
 ![다크 모드](docs/screenshots/05-dark-mode.png)
 
+**⑥ 실제 배포본(Vercel)에서 동작 확인** — 프론트는 `c3-2-web`, API는 `c3-2-api` 도메인으로 통신
+
+![배포 화면](docs/screenshots/06-deployed.png)
 ---
 
 ## 2. 배포 URL
 
 | 구분 | URL | 비고 |
 | --- | --- | --- |
-| 프론트엔드 (Vercel) | _배포 후 갱신_ | `API_BASE_URL` 환경변수로 백엔드 주소 주입 |
-| 백엔드 API (Render) | _배포 후 갱신_ | `uvicorn main:app` |
-| Swagger UI | _배포 후 갱신_ + `/docs` | OpenAPI 문서 |
+| 프론트엔드 (Vercel) | <https://c3-2-web.vercel.app> | `API_BASE_URL` 환경변수로 백엔드 주소 주입 |
+| 백엔드 API (Vercel) | <https://c3-2-api.vercel.app> | `/api/health`, `/api/data/summary` |
+| Swagger UI | <https://c3-2-api.vercel.app/docs> | OpenAPI 문서 |
+
+**라이브 데모 동작 범위**
+
+이 저장소는 계정/키 없이도 화면을 확인할 수 있도록 Vercel에 함께 배포했고, 현재 배포본은
+`DEMO_FALLBACK=true`라서 LLM 키가 없을 때 **규칙 기반 데모 응답**(응답 끝에 데모임을 명시)을 돌려줍니다.
+데이터 조회·CRUD·대화 저장·인사이트 탭은 모두 실제 API로 동작합니다.
+
+`OPENAI_API_KEY`(그리고 Firestore를 쓰려면 `FIREBASE_SERVICE_ACCOUNT_JSON`)를 환경변수에 넣고 재배포하면
+`/api/health`의 `llm_configured`가 `true`로 바뀌면서 **실제 GPT 응답·Firestore 저장**으로 자동 전환됩니다.
+운영용 구성은 아래 10장(Render) 절차를 그대로 사용하면 됩니다.
 
 > 무료 티어는 일정 시간 요청이 없으면 슬립 상태가 됩니다. 첫 요청 시 30~60초가 걸릴 수 있어
 > 프론트엔드는 로딩 4초 후 **"무료 티어 서버는 첫 요청 시 최대 50초까지 걸릴 수 있어요"** 안내 배너를 띄우고,

@@ -53,7 +53,13 @@
       .health()
       .then((health) => {
         state.health = health;
-        el["chat-model"].textContent = `${health.model} · ${health.storage_backend}`;
+        const storageLabel = health.storage_backend === "firestore" ? "Firestore" : "local";
+        el["chat-model"].textContent = health.llm_configured
+          ? `${health.model} · ${storageLabel}`
+          : "데모 모드 · 규칙 기반";
+        el["chat-model"].title = health.llm_configured
+          ? "OPENAI_API_KEY가 설정되어 GPT가 응답합니다."
+          : "OPENAI_API_KEY가 없어 규칙 기반 데모 응답을 사용합니다.";
         setStatus(
           "is-ok",
           `연결됨 · ${health.storage_backend === "firestore" ? "Firestore" : "로컬"} · ${health.data_points}건`

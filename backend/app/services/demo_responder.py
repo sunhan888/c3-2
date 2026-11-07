@@ -31,8 +31,8 @@ def generate_demo_answer(message: str, summary: dict, statistics: dict | None = 
     monthly = (statistics or {}).get("monthly") or []
     text = (message or "").lower()
 
-    if any(word in message for word in ("최고", "가장 좋", "최대", "베스트")):
-        memo = f" 당시 메모는 '{best['memo']}'였어요." if best.get("memo") else ""
+    if any(word in message for word in ("최고", "가장 좋", "좋았던", "좋은 날", "최대", "베스트", "피크")):
+        memo = f" (당시 메모: '{best['memo']}')" if best.get("memo") else ""
         return (
             f"전체 기간({period['label']})에서 가장 매출이 좋았던 날은 **{best['date']}**로 "
             f"**{_won(best['value'])}**을 기록했어요.{memo} 일평균({_won(metrics['average'])})보다 "
@@ -41,7 +41,7 @@ def generate_demo_answer(message: str, summary: dict, statistics: dict | None = 
         )
 
     if any(word in message for word in ("최저", "가장 나쁜", "최소", "부진")):
-        memo = f" 메모는 '{worst['memo']}'였어요." if worst.get("memo") else ""
+        memo = f" (당시 메모: '{worst['memo']}')" if worst.get("memo") else ""
         return (
             f"가장 매출이 낮았던 날은 **{worst['date']}**의 **{_won(worst['value'])}**예요.{memo} "
             f"일평균 대비 {worst['value'] / metrics['average'] * 100 - 100:+.1f}% 수준입니다."
