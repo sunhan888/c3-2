@@ -303,6 +303,7 @@ python3 -m http.server 5500     # http://localhost:5500
 ### 8.1 검증 명령
 
 ```bash
+pip install -r backend/requirements-dev.txt  # 테스트 도구 포함
 cd backend
 pytest -q                                   # 단위/통합 테스트 10건 (외부 API 불필요)
 python scripts/smoke_test.py                # 실행 중인 서버 대상 E2E 스모크(실제 LLM 호출)
@@ -450,6 +451,8 @@ $ cd backend && pytest -q
 | `test_chat_demo_fallback_without_key` | 키 없음 → 데모 응답 |
 | `test_conversation_crud` | 목록(messages 미포함) / 상세 / 제목 수정 / 삭제 |
 | `test_openapi_documents_endpoints` | Swagger 경로 노출 |
+
+GitHub Actions(`.github/workflows/ci.yml`)에서 push/PR마다 같은 테스트를 자동 실행합니다.
 
 실제 LLM 연동은 `scripts/smoke_test.py`로 별도 확인했습니다.
 

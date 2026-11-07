@@ -1,0 +1,4 @@
+-r requirements.txt
+
+# 테스트/검증 도구
+pytest==8.3.4
